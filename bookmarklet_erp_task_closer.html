@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bookmarklet: ERP Task Closer</title>
+		<style>
+			#source {
+				font-family: monospace;
+				white-space: pre;
+				tab-size: 4;
+				-moz-tab-size: 4;
+				-o-tab-size: 4;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Bookmarklet: ERP Task Closer</h1>
+		Completes a task quick in ERP, assigns to you, status set to complete, populates completion date, hits save.
+
+		<h3>Installation</h3>
+		Drag the following link to your bookmarks bar:
+		<a id="bookmarklet" href="javascript:">ERP Task Closer</a>
+
+		<h3>Source</h3>
+		<div id="source"></div>
+
+		<script>
+			(function () {
+				'use strict';
+
+				// the bookmarklet code
+				var code = function () {
+                    async function assignTo() {
+                        const buttonElement = document.querySelector('.add-assignment-btn');
+                        buttonElement.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function assignToMe() {
+                        const checkbox = document.querySelector("body > div.modal.fade.show > div > div > div.modal-body.ui-front > div:nth-child(1) > div > div.form-page > div:nth-child(1) > div > div > form > div.form-group.frappe-control.input-max-width > div > label > span.input-area > input");
+                        checkbox.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function clickAddButton() {
+                        const button = document.querySelector("body > div.modal.fade.show > div > div > div.modal-footer > div.standard-actions > button.btn.btn-primary.btn-sm.btn-modal-primary");
+                        button.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function clickStatusDropdown() {
+                        const dropdown = document.querySelector("#page-Task > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col.layout-main-section-wrapper > div.layout-main-section > div:nth-child(2) > div > div > div.form-page > div:nth-child(1) > div > div:nth-child(2) > form > div:nth-child(1) > div > div.control-input-wrapper > div.control-input.flex.align-center > select");
+                        dropdown.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+
+                    async function setStatusDropdown() {
+                        const dropdown = document.querySelector("#page-Task > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col.layout-main-section-wrapper > div.layout-main-section > div:nth-child(2) > div > div > div.form-page > div:nth-child(1) > div > div:nth-child(2) > form > div:nth-child(1) > div > div.control-input-wrapper > div.control-input.flex.align-center > select");
+                        dropdown.value = 'Completed';
+                        dropdown.dispatchEvent(new Event('change'));
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function openDocHeading() {
+                        const section = document.querySelector("#page-Task > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col.layout-main-section-wrapper > div.layout-main-section > div:nth-child(2) > div > div > div.form-page > div:nth-child(2) > div.section-head.collapsed");
+                        section.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function setCompDate() {
+                        const compDate = document.querySelector("#page-Task > div.container.page-body > div.page-wrapper > div > div.row.layout-main > div.col.layout-main-section-wrapper > div.layout-main-section > div:nth-child(2) > div > div > div.form-page > div:nth-child(2) > div.section-body > div.form-column.col-sm-12 > form > div:nth-child(4) > div > div.control-input-wrapper > div.control-input > input");
+
+                        const currentDate = new Date();
+                        const day = currentDate.getDate();
+                        const month = currentDate.getMonth() + 1;
+                        const year = currentDate.getFullYear();
+                        const formattedDate = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}-${year}`;
+
+                        compDate.value = formattedDate;
+                        compDate.dispatchEvent(new Event('change'));
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+                    async function clickSave() {
+                        const savebutton = document.querySelector("#page-Task > div.page-head.flex > div > div > div.flex.col.page-actions.justify-content-end > div.standard-actions.flex > button.btn.btn-primary.btn-sm.primary-action");
+                        savebutton.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    async function closeButton() {
+                        const closebutton = document.querySelector("body > div.modal.fade.show > div > div > div.modal-header > div.modal-actions > button.btn.btn-modal-close.btn-link");
+                        closebutton.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+
+
+
+                    async function doAll() {
+                        await assignTo();
+                        await assignToMe();
+                        await clickAddButton();
+                        await setStatusDropdown();
+                        await clickSave();
+                        await closeButton();
+                        await setCompDate();
+                        await clickSave();
+                    }
+
+                    doAll();
+				};
+
+				function stripComments(s) {
+					return s.replace(/\/{2}[^;\n]*$/mg, '');
+				}
+				function extractBody(s) {
+					return s.substring(s.indexOf('{') + 2, s.lastIndexOf('}'));
+				}
+				function collapseWhiteSpace(s) {
+					return s.replace(/([^}{;\s])\s*\n/mg, '$1;\n').replace(/^\s+|\s+$|\n/mg, '');
+				}
+				function outdent(s) {
+					var indentLevel = s.match(/^\s*/)[0].length;
+					return s.replace(new RegExp('^\\s{' + indentLevel + '}', 'mg'), '');
+				}
+				var source = '' + code,
+					bookmarklet = collapseWhiteSpace(extractBody(stripComments(source))),
+					preview = outdent(extractBody(source));
+
+				document.getElementById('bookmarklet').href += bookmarklet;
+				document.getElementById('source').innerText = preview;
+			}());
+		</script>
+	</body>
+</html>
