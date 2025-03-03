@@ -3,7 +3,7 @@ $DebugPreference = 'Continue'
 
 
 $tempFile = [System.IO.Path]::GetTempFileName() + '.ps1'
-Invoke-WebRequest -Uri 'https://gist.githubusercontent.com/doteater/89dcfb049425c084c0b6c81755a314ac/raw/' -OutFile $tempFile
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/doteater/doteater.github.io/refs/heads/master/myoffice.ps1' -OutFile $tempFile
 
 # Self-Elevation Function
 Function Elevate-Script {
