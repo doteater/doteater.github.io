@@ -246,3 +246,11 @@ if (Test-Path "$env:TEMP/Win11Debloat/Win11Debloat-master") {
 }
 
 Write-Output ""
+
+$message = "Windows 10/11 debloat complete`nReport any problems via IT Support Ticket!"
+$title = "Windows 10/11 debloat complete"
+# Use Start-Process to run the GUI in the user's context
+Start-Process powershell -ArgumentList @"
+    Add-Type -AssemblyName System.Windows.Forms;
+    [System.Windows.Forms.MessageBox]::Show('$message', '$title');
+"@ -NoNewWindow
