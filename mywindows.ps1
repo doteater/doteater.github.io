@@ -29,3 +29,11 @@ cscript //nologo slmgr.vbs /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43
 cscript //nologo slmgr.vbs /skms kms.sentracam.net:1688
 
 cscript //nologo slmgr.vbs /ato
+
+$message = "windows 10/11 activation complete`nReport any problems via IT Support Ticket!"
+$title = "windows 10/11 activation complete"
+# Use Start-Process to run the GUI in the user's context
+Start-Process powershell -ArgumentList @"
+    Add-Type -AssemblyName System.Windows.Forms;
+    [System.Windows.Forms.MessageBox]::Show('$message', '$title');
+"@ -NoNewWindow
