@@ -20,6 +20,8 @@ Function Elevate-Script {
 # Invoke Self-Elevation
 Elevate-Script
 
+cd C:\Windows\system32
+
 cscript //nologo slmgr.vbs /upk
 
 cscript //nologo slmgr.vbs /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43
