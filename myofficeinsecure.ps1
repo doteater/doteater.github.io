@@ -31,7 +31,7 @@ write-output "Installing Office..."
 #don't do this
 winget settings --enable InstallerHashOverride
 #DON'T DO THIS NONO 
-$process = Start-Process -FilePath "winget" -ArgumentList "install --id Microsoft.Office -e --silent --accept-package-agreements --accept-source-agreements --ignore-security-hash" -NoNewWindow -PassThru #DON'T DO THIS NONO
+$process = Start-Process -FilePath "winget" -ArgumentList "install  --ignore-security-hash --id Microsoft.Office -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -PassThru #DON'T DO THIS NONO
 
 $process.WaitForExit()
 
