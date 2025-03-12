@@ -1,4 +1,4 @@
-$scriptName = 'hidedolby'
+$scriptName = 'hideDolby'
 Start-Transcript "C:\windows\temp\$scriptName.log"
 $DebugPreference = 'Continue'
 
