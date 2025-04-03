@@ -245,6 +245,9 @@ if (Test-Path "$env:TEMP/Win11Debloat/Win11Debloat-master") {
     Get-ChildItem -Path "$env:TEMP/Win11Debloat/Win11Debloat-master" -Exclude CustomAppsList,SavedSettings | Remove-Item -Recurse -Force
 }
 
+#remove MS Store taskbar icon
+$appname = "Microsoft Store"
+((New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | Where-Object {$_.Name -eq $appname}).Verbs() | Where-Object {$_.Name.replace('&','') -match 'Unpin from taskbar'} | ForEach-Object {$_.DoIt()}
 Write-Output ""
 
 $message = "Windows 10/11 debloat complete`nReport any problems via IT Support Ticket!"
