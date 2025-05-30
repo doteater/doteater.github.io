@@ -109,24 +109,24 @@ Expand-Archive "$env:TEMP/win11debloat-temp.zip" "$env:TEMP/Win11Debloat"
 ###
 ###
 
-Set-Content "$env:TEMP/Win11Debloat/Win11Debloat-master/SavedSettings" -Value @"
-RemoveApps#- Remove default selection of bloatware apps
-RemoveCommApps#- Remove the Mail, Calendar, and People apps
-RemoveW11Outlook#- Remove the new Outlook for Windows app
-RemoveDevApps#- Remove developer-related apps
-RemoveGamingApps#- Remove the Xbox App and Xbox Gamebar
+Set-Content "CreateRestorePoint#- Create a system restore point
+RemoveAppsCustom#- Remove 131 apps:
 DisableDVR#- Disable Xbox game/screen recording
 DisableTelemetry#- Disable telemetry, diagnostic data, activity history, app-launch tracking & targeted ads
 DisableSuggestions#- Disable tips, tricks, suggestions and ads in start, settings, notifications and File Explorer
-DisableDesktopSpotlight#- Disable the Windows Spotlight desktop background option.
+DisableSettings365Ads#- Disable Microsoft 365 ads in Settings Home
 DisableLockscreenTips#- Disable tips & tricks on the lockscreen
 DisableBing#- Disable & remove bing web search, bing AI & cortana in Windows search
-DisableCopilot#- Disable and remove Windows Copilot
-DisableRecall#- Disable Windows Recall snapshots
+DisableCopilot#- Disable and remove Microsoft Copilot
+DisableRecall#- Disable and remove Windows Recall snapshots
+DisableDesktopSpotlight#- Disable the Windows Spotlight desktop background option.
+DisableStickyKeys#- Disable the Sticky Keys keyboard shortcut
+DisableFastStartup#- Disable Fast Start-up
 ClearStartAllUsers#- Remove all pinned apps from the start menu for all existing and new users
-DisableStartRecommended#- Disable & hide the recommended section in the start menu.
+HideSearchTb#- Hide search icon from the taskbar
 HideTaskview#- Hide the taskview button from the taskbar
 DisableWidgets#- Disable the widget service & hide the widget (news and interests) icon from the taskbar
+EnableEndTask#- Enable the 'End Task' option in the taskbar right click menu
 ShowHiddenFolders#- Show hidden files, folders and drives
 ShowKnownFileExt#- Show file extensions for known file types
 "@
