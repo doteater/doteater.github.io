@@ -109,7 +109,8 @@ Expand-Archive "$env:TEMP/win11debloat-temp.zip" "$env:TEMP/Win11Debloat"
 ###
 ###
 
-Set-Content "CreateRestorePoint#- Create a system restore point
+Set-Content  "$env:TEMP/Win11Debloat/Win11Debloat-master/SavedSettings" -Value @"
+CreateRestorePoint#- Create a system restore point
 RemoveAppsCustom#- Remove 131 apps:
 DisableDVR#- Disable Xbox game/screen recording
 DisableTelemetry#- Disable telemetry, diagnostic data, activity history, app-launch tracking & targeted ads
