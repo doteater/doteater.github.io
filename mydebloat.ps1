@@ -1,27 +1,3 @@
-$scriptname = 'mydebloat'
-
-Start-Transcript "C:\windows\temp\$scriptname.log"
-$DebugPreference = 'Continue'
-
-
-$tempFile = [System.IO.Path]::GetTempFileName() + '.ps1'
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/doteater/doteater.github.io/refs/heads/master/$scriptname.ps1" -OutFile $tempFile
-
-# Self-Elevation Function
-Function Elevate-Script {
-    If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-        $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell"
-        $newProcess.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$tempFile`""
-        $newProcess.Verb = "runas"
-        [System.Diagnostics.Process]::Start($newProcess) | Out-Null
-        Exit
-    }
-}
-
-# Invoke Self-Elevation
-Elevate-Script
-
-
 param (
     [switch]$Silent,
     [switch]$Verbose,
@@ -70,6 +46,33 @@ param (
     [switch]$DisableGiveAccessTo, [switch]$HideGiveAccessTo,
     [switch]$DisableShare, [switch]$HideShare
 )
+
+
+$scriptname = 'mydebloat'
+
+Start-Transcript "C:\windows\temp\$scriptname.log"
+$DebugPreference = 'Continue'
+
+
+$tempFile = [System.IO.Path]::GetTempFileName() + '.ps1'
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/doteater/doteater.github.io/refs/heads/master/$scriptname.ps1" -OutFile $tempFile
+
+# Self-Elevation Function
+Function Elevate-Script {
+    If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell"
+        $newProcess.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$tempFile`""
+        $newProcess.Verb = "runas"
+        [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+        Exit
+    }
+}
+
+# Invoke Self-Elevation
+Elevate-Script
+
+
+
 
 # Show error if current powershell environment does not have LanguageMode set to FullLanguage 
 if ($ExecutionContext.SessionState.LanguageMode -ne "FullLanguage") {
