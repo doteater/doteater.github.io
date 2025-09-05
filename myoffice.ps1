@@ -82,6 +82,31 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Softw
 
 write-output "DONE Activating Office"
 
+write-output "disabling ms acct sign in"
+
+function Set-RegistryValue {
+    param (
+        [string]$Hive, #String, DWord, 
+        [string]$Path,
+        [string]$Name,
+        [object]$Value,
+        [Microsoft.Win32.RegistryValueKind]$Kind
+        #[string]$Kind
+        #[string]$User
+    )
+
+    get-item -Path "Registry::$Hive`\$Path" -ErrorAction SilentlyContinue -ErrorVariable 'found' | out-null
+    if(-not [string]::IsNullOrWhiteSpace($found)) {
+        #doesn't exist, create
+        New-Item -Path "Registry::$Hive`\$Path" -Force | Out-Null
+    }
+    Set-ItemProperty -Path "Registry::$Hive`\$Path" -Name $Name -Value $Value -type $Kind
+}
+
+Set-RegistryValue "HKEY_CURRENT_USER" "SOFTWARE\Microsoft\Office\16.0\Common\SignIn" "SignInOptions" 3 DWord
+
+write-output "DONE disabling ms acct sign in"
+
 $message = "Office Install and Activation Complete!`nPlease close any remaining command prompt windows.`nReport any problems via IT Support Ticket!"
 $title = "Office Install and Activation Complete"
 # Use Start-Process to run the GUI in the user's context
