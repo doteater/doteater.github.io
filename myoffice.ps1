@@ -44,15 +44,15 @@ write-output "DONE Installing Office"
 write-output "Activating Office..."
 
 # Change directory to Office16
-$pathx64 = "C:\Program Files\Microsoft Office\Office16"
-$pathx86 = "C:\Program Files (x86)\Microsoft Office\Office16"
+$pathx64 = "C:\Program Files\Microsoft Office\root\Office16"
+$pathx86 = "C:\Program Files (x86)\Microsoft Office\root\Office16"
 if (Test-Path $pathx64) { Set-Location $pathx64 }
 elseif (Test-Path $pathx86) { Set-Location $pathx86 }
 else { Write-Error "No office installation found, failed to activate"; exit 1 }
 
 # Convert retail to VLK by installing VLK licenses
-Get-ChildItem "..\root\Licenses16\ProPlus2019VL*.xrm-ms" | ForEach-Object {
-    cscript //nologo //B ospp.vbs /inslic:"..\root\Licenses16\$($_.Name)"
+Get-ChildItem "..\Licenses16\ProPlus2019VL*.xrm-ms" | ForEach-Object {
+    cscript //nologo //B ospp.vbs /inslic:"..\Licenses16\$($_.Name)"
 }
 
 # Check and remove existing product key
