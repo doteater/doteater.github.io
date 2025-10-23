@@ -27,9 +27,32 @@ Elevate-Script
 
 write-output "Installing Office..."
 
-$process = Start-Process -FilePath "winget" -ArgumentList "install --id Microsoft.Office -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -PassThru
+$odtBootstrap = "$env:TEMP\odt.exe"
+Invoke-WebRequest -Uri "https://download.microsoft.com/download/6c1eeb25-cf8b-41d9-8d0d-cc1dbc032140/officedeploymenttool_19029-20278.exe" -OutFile $odtBootstrap
 
-$process.WaitForExit()
+$extractPath = "$env:TEMP\ODT"
+Start-Process -FilePath $odtBootstrap -ArgumentList "/quiet /extract:$extractPath" -Wait
+
+$configXml = @"
+<Configuration>
+  <Add OfficeClientEdition="64" Channel="Current">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="en-us" />
+      <ExcludeApp ID="Outlook" />
+      <ExcludeApp ID="Teams" />
+      <ExcludeApp ID="OneDrive" />
+    </Product>
+  </Add>
+  <Display Level="None" AcceptEULA="TRUE" />
+</Configuration>
+"@
+
+$configPath = Join-Path $extractPath "config.xml"
+$configXml | Out-File -FilePath $configPath -Encoding UTF8
+
+$realSetup = Join-Path $extractPath "setup.exe"
+Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -Wait -NoNewWindow #-Priority BelowNormal if cpu is too much?
+
 
 #pause briefly needed?
 start-sleep 5
@@ -46,8 +69,8 @@ write-output "Activating Office..."
 # Change directory to Office16
 $pathx64 = "C:\Program Files\Microsoft Office\root\Office16"
 $pathx86 = "C:\Program Files (x86)\Microsoft Office\root\Office16"
-if (Test-Path $pathx64) { Set-Location $pathx64 }
-elseif (Test-Path $pathx86) { Set-Location $pathx86 }
+if (Test-Path $pathx64) { Set-Location $pathx64 } `
+elseif (Test-Path $pathx86) { Set-Location $pathx86 } `
 else { Write-Error "No office installation found, failed to activate"; exit 1 }
 
 # Convert retail to VLK by installing VLK licenses
