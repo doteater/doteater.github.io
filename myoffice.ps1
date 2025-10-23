@@ -27,6 +27,15 @@ Elevate-Script
 
 write-output "Installing Office..."
 
+#we'll see if this url remains stable
+#https://www.microsoft.com/download/details.aspx?id=49117 ?
+# aka.ms/odt
+$known = "officedeploymenttool_19029-20278.exe"
+(Invoke-WebRequest "https://www.microsoft.com/download/details.aspx?id=49117").Content -match 'officedeploymenttool_\d+-\d+\.exe' | Out-Null; 
+$current = $matches[0]
+if ($current -ne $known) { Write-Warning "WARNING ODT UPDATED, THIS MIGHT NOT WORK: $current" } else { Write-Output "ODT UNCHANGED: $current" }
+
+
 $odtBootstrap = "$env:TEMP\odt.exe"
 Invoke-WebRequest -Uri "https://download.microsoft.com/download/6c1eeb25-cf8b-41d9-8d0d-cc1dbc032140/officedeploymenttool_19029-20278.exe" -OutFile $odtBootstrap
 
