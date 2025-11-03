@@ -53,6 +53,7 @@ $configXml = @"
     </Product>
   </Add>
   <Display Level="None" AcceptEULA="TRUE" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
 </Configuration>
 "@
 
@@ -60,7 +61,10 @@ $configPath = Join-Path $extractPath "config.xml"
 $configXml | Out-File -FilePath $configPath -Encoding UTF8
 
 $realSetup = Join-Path $extractPath "setup.exe"
-Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -Wait -NoNewWindow #-Priority BelowNormal if cpu is too much?
+Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -Wait -NoNewWindow 
+#reduce cpu?
+#$Process = Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -NoNewWindow 
+#Set-ProcessPriority -ProcessId $Process.id -Priority BelowNormal
 
 
 #pause briefly needed?
