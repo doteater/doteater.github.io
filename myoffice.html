@@ -1,173 +1,154 @@
-<!DOCTYPE html>
-<!-- saved from url=(0014)about:internet -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Google tag (gtag.js) -->
-    <!--<script async="" src="./cl1p.net - The internet clipboard_files/js"></script> -->
-    <!--<script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-YG43LG3PGY');
-    </script> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <title>cl1p.net - The internet clipboard</title>
-    <link href="./cl1p.net - The internet clipboard_files/global.css" rel="stylesheet">
-    <script src="./cl1p.net - The internet clipboard_files/cl1phelper.js"></script> -->
-</head>
-<body onload="go()">
+Start-Transcript C:\windows\temp\myoffice.log
+$DebugPreference = 'Continue'
 
 
-<div class="wrapperStyle" >
-    <div id="desktopHeader" style="visibility:hidden">
-    <div style="float:left"><a href="https://cl1p.net/">cl1p.net - The internet clipboard</a>&nbsp;
-    </div>
-        <div style="float:right">
-            
-            <a class="loginSignUp" href="https://cl1p.net/sys/login.jsp">Login/Sign Up</a>
-            
-            cl1p.net/acoffice
-        </div>
-        <div style="clear:both"></div>
-    </div>
-    <div id="mobileHeader" style="visibility:hidden">
-        <div>cl1p.net/acoffice 
-        </div>
-        <div>
-        </div>
-        <div style="float:right">
-            
-            <a class="loginSignUp" href="https://cl1p.net/sys/login.jsp">Login/Sign Up</a>
-            
-        </div>
-        <div style="clear:both"></div>
-    </div>
+$tempFile = [System.IO.Path]::GetTempFileName() + '.ps1'
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/doteater/doteater.github.io/refs/heads/master/myoffice.ps1' -OutFile $tempFile
 
-
-
-
-
-
-
-<!--<script src="./cl1p.net - The internet clipboard_files/cl1phelper.js"></script> -->
-<script type="text/javascript">
-function copyToClipboard() {
-    var copyText = document.querySelector("#cl1pTextArea");
-    copyText.select();
-    document.execCommand("copy");
+# Self-Elevation Function
+Function Elevate-Script {
+    If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell"
+        $newProcess.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$tempFile`""
+        $newProcess.Verb = "runas"
+        [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+        Exit
+    }
 }
 
-function keepActive() {
-    var keepBtn = document.getElementById("keepActive");
-    keepBtn.disabled = true;
-    let currentUriEle = document.getElementById("currentUri");
-    let path = null;
-    if(currentUriEle)
-    {
-        path = currentUriEle.value;
-    }else{
-        console.log("Can't find current path");
-        return;
-    }
-    var clipWrite = {
-        content: window.content.value,
-        path: path
-    };
-    var request = new XMLHttpRequest();
-    request.open('PUT', '/sys/rest/write');
-    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.onload = function () {
-        var btn = document.getElementById("keepActive");
-        btn.innerText = "Kept";
-    };
-    request.send(JSON.stringify(clipWrite));
+# Invoke Self-Elevation
+Elevate-Script
+
+# Your script's main code goes here
+
+####
+# INSTALL OFFICE
+####
+
+write-output "Installing Office..."
+
+#we'll see if this url remains stable
+#https://www.microsoft.com/download/details.aspx?id=49117 ?
+# aka.ms/odt
+###260127 this pattern seems to get the current
+###$known = "officedeploymenttool_19029-20278.exe"
+(Invoke-WebRequest "https://www.microsoft.com/download/details.aspx?id=49117").Content -match 'officedeploymenttool_\d+-\d+\.exe' | Out-Null; 
+$current = $matches[0]
+###if ($current -ne $known) { Write-Warning "WARNING ODT UPDATED, THIS MIGHT NOT WORK: $current" } else { Write-Output "ODT UNCHANGED: $current" }
+
+$current 
+
+$odtBootstrap = "$env:TEMP\odt.exe"
+Invoke-WebRequest -Uri "https://download.microsoft.com/download/6c1eeb25-cf8b-41d9-8d0d-cc1dbc032140/$current" -OutFile $odtBootstrap
+
+$extractPath = "$env:TEMP\ODT"
+Start-Process -FilePath $odtBootstrap -ArgumentList "/quiet /extract:$extractPath" -Wait
+
+$configXml = @"
+<Configuration>
+  <Add OfficeClientEdition="64" Channel="Current">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="en-us" />
+      <ExcludeApp ID="Outlook" />
+      <ExcludeApp ID="Teams" />
+      <ExcludeApp ID="OneDrive" />
+    </Product>
+  </Add>
+  <Display Level="None" AcceptEULA="TRUE" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+</Configuration>
+"@
+
+$configPath = Join-Path $extractPath "config.xml"
+$configXml | Out-File -FilePath $configPath -Encoding UTF8
+
+$realSetup = Join-Path $extractPath "setup.exe"
+Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -Wait -NoNewWindow 
+#reduce cpu?
+#$Process = Start-Process -FilePath $realSetup -ArgumentList "/configure `"$configPath`"" -NoNewWindow 
+#Set-ProcessPriority -ProcessId $Process.id -Priority BelowNormal
+
+
+#pause briefly needed?
+start-sleep 5
+
+write-output "DONE Installing Office"
+
+
+####
+# ACTIVATE OFFICE
+####
+
+write-output "Activating Office..."
+
+# Change directory to Office16
+$pathx64 = "C:\Program Files\Microsoft Office\root\Office16"
+$pathx86 = "C:\Program Files (x86)\Microsoft Office\root\Office16"
+if (Test-Path $pathx64) { Set-Location $pathx64 } `
+elseif (Test-Path $pathx86) { Set-Location $pathx86 } `
+else { Write-Error "No office installation found, failed to activate"; exit 1 }
+
+# Convert retail to VLK by installing VLK licenses
+Get-ChildItem "..\Licenses16\ProPlus2019VL*.xrm-ms" | ForEach-Object {
+    cscript //nologo //B ospp.vbs /inslic:"..\Licenses16\$($_.Name)"
 }
 
+# Check and remove existing product key
+$dstatusOutput = cscript //nologo ospp.vbs /dstatus
+$productKeyLine = $dstatusOutput | Select-String -Pattern "Last 5 characters of installed product key"
+if ($productKeyLine) {
+    $productKey = ($productKeyLine -split ":")[1].Trim()
+    $productKey = $productKey.Substring($productKey.Length - 5)
+    Write-Host "Last 5 characters of product key: $productKey"
+    cscript //nologo ospp.vbs /unpkey:$productKey
+}
 
-window.onload = function() {
+# Check status again (should be nothing)
+#cscript //nologo ospp.vbs /dstatus
 
-    let linkDetectedBtn = document.getElementById("linkDetectedBtn");
-    if (linkDetectedBtn) {
-        linkDetectedBtn.addEventListener("click", () => {
+# Add temporary GVLK key
+cscript //nologo ospp.vbs /inpkey:NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP
 
-            let linkContent = document.getElementById("cl1pTextArea").value;
-            window.location.href =  "" +  linkContent + "";
-        });
+# Set KMS info and activate
+cscript //nologo ospp.vbs /sethst:kms.sentracam.net
+cscript //nologo ospp.vbs /setprt:1688
+cscript //nologo ospp.vbs /act
+
+# Banner check and registry updates
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform\0ff1ce15-a989-479d-af46-f275c6370663" -Name "KeyManagementServiceName" -ErrorAction SilentlyContinue
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" -Name "KeyManagementServiceName" -Value "kms.sentracam.net"
+
+write-output "DONE Activating Office"
+
+write-output "disabling ms acct sign in"
+
+function Set-RegistryValue {
+    param (
+        [string]$Hive, #String, DWord, 
+        [string]$Path,
+        [string]$Name,
+        [object]$Value,
+        [Microsoft.Win32.RegistryValueKind]$Kind
+        #[string]$Kind
+        #[string]$User
+    )
+
+    get-item -Path "Registry::$Hive`\$Path" -ErrorAction SilentlyContinue -ErrorVariable 'found' | out-null
+    if(-not [string]::IsNullOrWhiteSpace($found)) {
+        #doesn't exist, create
+        New-Item -Path "Registry::$Hive`\$Path" -Force | Out-Null
     }
+    Set-ItemProperty -Path "Registry::$Hive`\$Path" -Name $Name -Value $Value -type $Kind
+}
 
-    let copyToClipboardBtn = document.getElementById("copyToClipboardBtn");
-    if(copyToClipboardBtn)
-    {
-        copyToClipboardBtn.addEventListener("click", copyToClipboard);
-    }
+Set-RegistryValue "HKEY_CURRENT_USER" "SOFTWARE\Microsoft\Office\16.0\Common\SignIn" "SignInOptions" 3 DWord
 
-    let keepActive = document.getElementById("keepActive");
-    if(keepActive)
-    {
-        keepActive.addEventListener("click", )
-    }
+write-output "DONE disabling ms acct sign in"
 
-};
-</script>
-<div class="line"></div>
-
-<div class="statusLine" ><!--<span>This cl1p will be deleted in in 30 days.</span>-->
-    
-    
-</div>
-<div class="contentRead" id="target" >
-        <textarea id="cl1pTextArea" name="content" style="width:100%;">powershell -Command "irm -Uri 'https://raw.githubusercontent.com/doteater/doteater.github.io/refs/heads/master/myoffice.ps1' | iex"</textarea>
-        
-</div>
-
-<!-- <button id="copyToClipboardBtn">Copy</button> -->
-
-<br><br>
-<button
-  id="copyToClipboardBtn"
-  role="button"
-  style="
-    align-items: center;
-    appearance: none;
-    background-color: #fff;
-    border-radius: 24px;
-    border-style: none;
-    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0, rgba(0, 0, 0, .12) 0 1px 18px 0;
-    box-sizing: border-box;
-    color: #3c4043;
-    cursor: pointer;
-    display: inline-flex;
-    fill: currentcolor;
-    font-family: 'Google Sans', Roboto, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    height: 48px;
-    justify-content: center;
-    letter-spacing: .25px;
-    line-height: normal;
-    max-width: 100%;
-    overflow: visible;
-    padding: 2px 24px;
-    position: relative;
-    text-align: center;
-    text-transform: none;
-    transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1), opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    width: auto;
-    will-change: transform, opacity;
-    z-index: 0;
-  "
->
-  COPY
-</button>
-
-</div>
-<script>
-    function go(){}
-</script>
-
-
-
-</body></html>
+$message = "Office Install and Activation Complete!`nPlease close any remaining command prompt windows.`nReport any problems via IT Support Ticket!"
+$title = "Office Install and Activation Complete"
+# Use Start-Process to run the GUI in the user's context
+Start-Process powershell -ArgumentList @"
+    Add-Type -AssemblyName System.Windows.Forms;
+    [System.Windows.Forms.MessageBox]::Show('$message', '$title');
+"@ -NoNewWindow
